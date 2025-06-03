@@ -10,8 +10,9 @@ export default defineConfig({
     name: 'user-ui',
     filename: 'remoteEntry.js',
     remotes: {
+      components_ui: 'https://components-ui.davidcamelo.com/assets/remoteEntry.js',
       user_ui: 'https://user-ui.davidcamelo.com/assets/remoteEntry.js',
-      product_ui: 'http://product-ui.davidcamelo.com/assets/remoteEntry.js'
+      product_ui: 'https://product-ui.davidcamelo.com/assets/remoteEntry.js'
     },
     shared: ['react']
     }),
