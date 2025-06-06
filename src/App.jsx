@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import './App.css'
 import { Header } from 'components_ui/Header'
 import User from 'user_ui/User'
 import Product from 'product_ui/Product'
