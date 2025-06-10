@@ -9,7 +9,7 @@ export default defineConfig({
     react(),
     tailwindcss(),
     federation({
-    name: 'user-ui',
+    name: 'react-ui',
     filename: 'remoteEntry.js',
     remotes: {
       components_ui: 'https://components-ui.davidcamelo.com/assets/remoteEntry.js',
