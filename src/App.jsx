@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import Tabs from 'components_ui/Tabs';
-import UsersPage from 'user_ui/UsersPage';
-import ProductsPage from 'product_ui/ProductsPage';
+import { Tabs } from 'components_ui/Tabs';
+import { UsersPage } from 'user_ui/UsersPage';
+import { ProductsPage } from 'product_ui/ProductsPage';
 import { Header } from 'components_ui/Header';
 import './App.css';
 
