@@ -1,25 +1,19 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Tabs } from 'components_ui/Tabs';
 import { UsersPage } from 'user_ui/UsersPage';
 import { ProductsPage } from 'product_ui/ProductsPage';
 
 export const TabsLayout = () => {
-  const [activeTab, setActiveTab] = useState('users');
 
   const tabs = [
-      { name: 'users', label: 'Users' },
-      { name: 'products', label: 'Products' },
+      { name: 'Users', content: <UsersPage /> },
+      { name: 'Products', content: <ProductsPage /> },
   ];
 
   return (
     <>
       <div className="container mx-auto p-4 bg-gray-50 min-h-screen">
-        <Tabs tabs={tabs} activeTab={activeTab} onTabClick={setActiveTab} />
-
-        <div className="mt-6">
-          {activeTab === 'users' && <UsersPage />}
-          {activeTab === 'products' && <ProductsPage />}
-        </div>
+        <Tabs tabs={tabs} />
       </div>
     </>
   );

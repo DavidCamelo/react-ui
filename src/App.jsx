@@ -6,7 +6,7 @@ import './App.css';
 const App = () => {
   return (
     <>
-      <Header label="Example Header" onCreateAccount={() => {}} onLogin={() => {}} onLogout={() => {}} user={{name: 'David Camelo'}}/>
+      <Header title="React UI" menuItems={[{ name: 'Home', href: '#' }, { name: 'About', href: '#'}]} />
       <TabsLayout />
     </>
   );
