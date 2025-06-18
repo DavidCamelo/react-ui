@@ -12,7 +12,7 @@ export const TabsLayout = () => {
 
   return (
     <>
-      <div className="container mx-auto p-4 bg-gray-50 min-h-screen">
+      <div className="container mx-auto p-4 bg-gray-50">
         <Tabs tabs={tabs} />
       </div>
     </>
