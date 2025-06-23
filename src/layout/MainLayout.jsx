@@ -1,14 +1,25 @@
 import React, { useState } from 'react';
-import { useAuth } from '../auth/useAuth';
 import { Header } from 'components_ui/Header';
+import { Login } from 'components_ui/Login';
+import { Card } from 'components_ui/Card';
+import { Modal } from 'components_ui/Modal';
 import { TabsLayout } from './TabsLayout';
-import LoginModal from '../components/LoginModal';
 import { Footer } from 'components_ui/Footer';
+import { authService } from 'components_ui/api';
 import PrivateRoute from '../components/PrivateRoute';
 
 const MainLayout = () => {
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
-  const { isAuthenticated, logout } = useAuth();
+  const [user, setUser] = useState(null);
+
+  const handleLoginSuccess = (userData) => {
+      setUser(userData);
+      setIsLoginModalOpen(false);
+  };
+
+  const handleLogout = () => {
+      setUser(null);
+  };
 
   return (
     <>
@@ -16,10 +27,20 @@ const MainLayout = () => {
         title="React UI"
         menuItems={[{ name: 'Home', href: '#' }, { name: 'About', href: '#'}]}
         onLoginClick={() => setIsLoginModalOpen(true)}
-        onLogout={logout}
-        user={ isAuthenticated ? {avatarUrl: 'https://placehold.co/40x40/EFEFEF/3A3A3A?text=JD', name: 'Jane Doe'} : null }
+        onLogout={handleLogout}
+        user={user}
       />
-      <LoginModal isOpen={isLoginModalOpen} onClose={() => setIsLoginModalOpen(false)} />
+      <Card>
+        {!user && <p>Please log in to see more content.</p>}
+        {user && <p>{user.name} logged in.</p>}
+      </Card>
+      <Modal isOpen={isLoginModalOpen} onClose={() => setIsLoginModalOpen(false)} title="Member Login">
+        <Login
+          service={authService}
+          onLoginSuccess={handleLoginSuccess}
+          onCancel={() => setIsLoginModalOpen(false)}
+        />
+      </Modal>
       <PrivateRoute>
         <TabsLayout />
       </PrivateRoute>
