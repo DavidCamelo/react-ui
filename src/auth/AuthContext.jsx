@@ -1,4 +1,4 @@
-import React, { createContext, useState } from 'react';
+import React, { createContext, useState, useEffect, useCallback } from 'react';
 import { authService } from 'components_ui/api';
 
 export const AuthContext = createContext(null);
@@ -7,6 +7,7 @@ export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(JSON.parse(sessionStorage.getItem('user')));
     const [accessToken, setAccessToken] = useState(sessionStorage.getItem('accessToken'));
     const [refreshToken, setRefreshToken] = useState(sessionStorage.getItem('refreshToken'));
+    const [loading, setLoading] = useState(false);
 
     const login = async (username, password) => {
         const { accessToken, refreshToken } = await authService.login(username, password);
@@ -22,14 +23,42 @@ export const AuthProvider = ({ children }) => {
         sessionStorage.setItem('refreshToken', refreshToken);
     };
 
-    const logout = () => {
+    const logout = useCallback(() => {
         setUser(null);
         setAccessToken(null);
         setRefreshToken(null);
         sessionStorage.removeItem('user');
         sessionStorage.removeItem('accessToken');
         sessionStorage.removeItem('refreshToken');
-    };
+    }, []);
+
+    useEffect(() => {
+        if (!refreshToken) {
+            return;
+        }
+
+        const REFRESH_INTERVAL = 10000; // 15 * 60 * 1000 -> 15 minutes
+
+        const interval = setInterval(async () => {
+            if (refreshToken && !loading) {
+                setLoading(true);
+                try {
+                    const newAccessToken = await authService.refreshToken(refreshToken);
+                    console.log('Access token refreshed:', newAccessToken);
+                    setAccessToken(newAccessToken);
+                    sessionStorage.setItem('accessToken', newAccessToken);
+                } catch (error) {
+                    console.error('Session expired. Please log in again.', error);
+                    logout();
+                } finally {
+                    setLoading(false);
+                }
+            }
+        }, REFRESH_INTERVAL);
+
+        return () => clearInterval(interval);
+    }, [refreshToken, logout, loading]);
+
 
     const value = {
         accessToken,
