@@ -1,6 +1,6 @@
 import React from 'react';
 import { AuthProvider } from './auth/AuthContext';
-import MainLayout from './layout/MainLayout';
+import { MainLayout } from './layout/MainLayout';
 import './App.css';
 
 const App = () => {

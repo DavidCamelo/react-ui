@@ -1,7 +1,7 @@
 import React from 'react';
 import { useAuth } from '../auth/useAuth';
 
-const PrivateRoute = ({ children }) => {
+export const PrivateRoute = ({ children }) => {
     const { isAuthenticated } = useAuth();
 
     if (!isAuthenticated) {
