@@ -11,6 +11,7 @@ export const AuthProvider = ({ children }) => {
 
     const login = async (username, password) => {
         const { accessToken, refreshToken, accessTokenExpiration } = await authService.login(username, password);
+        const expirationTime = Date.now() + accessTokenExpiration;
         const userData = {
             name: username,
             avatarUrl: 'https://placehold.co/40x40/EFEFEF/3A3A3A?text=' + username.substring(0, 1).toUpperCase(),
@@ -21,7 +22,7 @@ export const AuthProvider = ({ children }) => {
         sessionStorage.setItem('user', JSON.stringify(userData));
         sessionStorage.setItem('accessToken', accessToken);
         sessionStorage.setItem('refreshToken', refreshToken);
-        sessionStorage.setItem('accessTokenExpiration', accessTokenExpiration);
+        sessionStorage.setItem('accessTokenExpiration', expirationTime);
     };
 
     const logout = useCallback(async () => {
@@ -45,10 +46,11 @@ export const AuthProvider = ({ children }) => {
             setLoading(true);
             try {
                 const { accessToken, accessTokenExpiration } = await authService.refreshToken(currentRefreshToken);
-                console.log('Access token refreshed');
+                const expirationTime = Date.now() + accessTokenExpiration;
+                console.log('Token refreshed successfully');
                 setAccessToken(accessToken);
                 sessionStorage.setItem('accessToken', accessToken);
-                sessionStorage.setItem('accessTokenExpiration', accessTokenExpiration);
+                sessionStorage.setItem('accessTokenExpiration', expirationTime);
             } catch (error) {
                 console.error('Session expired. Please log in again.', error);
                 logout();
@@ -64,19 +66,16 @@ export const AuthProvider = ({ children }) => {
             return;
         }
         const expirationTime = parseInt(expirationTimeStr, 10);
-        console.log(expirationTimeStr);
-        const delay = expirationTime - (60 * 1000); // Refresh 1 minute before expiration
-        console.log(delay);
+        console.log('Next token refresh scheduled at:', new Date(expirationTime - (60 * 1000)).toLocaleString());
+        const now = Date.now();
+        const delay = expirationTime - now - (60 * 1000); // Refresh 1 minute before expiration
         if (delay <= 0) {
             refreshAuthToken();
             return;
         }
-
         const timerId = setTimeout(refreshAuthToken, delay);
-
         return () => clearTimeout(timerId);
     }, [accessToken, refreshAuthToken]);
-
 
     const value = {
         accessToken,
