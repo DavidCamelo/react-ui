@@ -23,13 +23,22 @@ export const AuthProvider = ({ children }) => {
         sessionStorage.setItem('refreshToken', refreshToken);
     };
 
-    const logout = useCallback(() => {
-        setUser(null);
-        setAccessToken(null);
-        setRefreshToken(null);
-        sessionStorage.removeItem('user');
-        sessionStorage.removeItem('accessToken');
-        sessionStorage.removeItem('refreshToken');
+    const logout = useCallback(async () => {
+        const currentToken = sessionStorage.getItem('accessToken');
+        if (currentToken) {
+            try {
+                await authService.logout(currentToken);
+            } catch (error) {
+                console.error("Logout failed on server, clearing session locally.", error);
+            } finally {
+                setUser(null);
+                setAccessToken(null);
+                setRefreshToken(null);
+                sessionStorage.removeItem('user');
+                sessionStorage.removeItem('accessToken');
+                sessionStorage.removeItem('refreshToken');
+            }
+        }
     }, []);
 
     useEffect(() => {
@@ -37,14 +46,14 @@ export const AuthProvider = ({ children }) => {
             return;
         }
 
-        const REFRESH_INTERVAL = 10000; // 15 * 60 * 1000 -> 15 minutes
+        const REFRESH_INTERVAL = 60000;
 
         const interval = setInterval(async () => {
             if (refreshToken && !loading) {
                 setLoading(true);
                 try {
                     const newAccessToken = await authService.refreshToken(refreshToken);
-                    console.log('Access token refreshed:', newAccessToken);
+                    console.log('Access token refreshed');
                     setAccessToken(newAccessToken);
                     sessionStorage.setItem('accessToken', newAccessToken);
                 } catch (error) {
