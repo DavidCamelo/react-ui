@@ -11,19 +11,21 @@ import { useAuth } from '../auth/useAuth';
 
 export const MainLayout = () => {
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState(0);
   const { logout, user } = useAuth();
 
   const onClose = () => {
     setIsLoginModalOpen(false)
   }
 
-  const menuItems = [{ name: 'Users', href: 'users' }, { name: 'Products', href: 'products'}];
+  const menuItems = [{ name: 'Users', href: 'users', index: 0 }, { name: 'Products', href: 'products', index: 1 }];
   const tabs = [{ name: 'Users', content: <UsersPage /> }, { name: 'Products', content: <ProductsPage /> }];
 
   return (
     <>
       <Header title="React UI"
         menuItems={menuItems}
+        onMenuItemClick={(item) => setActiveTab(item.index)}
         onLoginClick={() => setIsLoginModalOpen(true)}
         onLogout={logout}
         user={user}
@@ -33,7 +35,7 @@ export const MainLayout = () => {
       </Modal>
       <PrivateRoute>
         <div className="container mx-auto p-4 bg-gray-50">
-          <Tabs tabs={tabs} />
+          <Tabs tabs={tabs} activeTab={activeTab} onTabChange={setActiveTab} />
         </div>
       </PrivateRoute>
       <Footer text="© 2025 David Camelo, Inc. All rights reserved." />

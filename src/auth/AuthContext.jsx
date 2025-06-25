@@ -10,8 +10,11 @@ export const AuthProvider = ({ children }) => {
     const [loading, setLoading] = useState(false);
 
     const login = async (username, password) => {
-        const { accessToken, refreshToken, accessTokenExpiration } = await authService.login(username, password);
+        const { accessToken, refreshToken, accessTokenExpiration, refreshTokenExpiration } = await authService.login(username, password);
         const expirationTime = Date.now() + accessTokenExpiration;
+        const refreshExpirationTime = Date.now() + refreshTokenExpiration;
+        console.log('Login successful, access token expires at:', new Date(expirationTime).toLocaleString());
+        console.log('Refresh token expires at:', new Date(refreshExpirationTime).toLocaleString());
         const userData = {
             name: username,
             avatarUrl: 'https://placehold.co/40x40/EFEFEF/3A3A3A?text=' + username.substring(0, 1).toUpperCase(),
