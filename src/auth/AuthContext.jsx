@@ -10,7 +10,7 @@ export const AuthProvider = ({ children }) => {
     const [loading, setLoading] = useState(false);
 
     const login = async (username, password) => {
-        const { accessToken, refreshToken } = await authService.login(username, password);
+        const { accessToken, refreshToken, accessTokenExpiration } = await authService.login(username, password);
         const userData = {
             name: username,
             avatarUrl: 'https://placehold.co/40x40/EFEFEF/3A3A3A?text=' + username.substring(0, 1).toUpperCase(),
@@ -21,6 +21,7 @@ export const AuthProvider = ({ children }) => {
         sessionStorage.setItem('user', JSON.stringify(userData));
         sessionStorage.setItem('accessToken', accessToken);
         sessionStorage.setItem('refreshToken', refreshToken);
+        sessionStorage.setItem('accessTokenExpiration', accessTokenExpiration);
     };
 
     const logout = useCallback(async () => {
@@ -30,43 +31,51 @@ export const AuthProvider = ({ children }) => {
                 await authService.logout(currentToken);
             } catch (error) {
                 console.error("Logout failed on server, clearing session locally.", error);
-            } finally {
-                setUser(null);
-                setAccessToken(null);
-                setRefreshToken(null);
-                sessionStorage.removeItem('user');
-                sessionStorage.removeItem('accessToken');
-                sessionStorage.removeItem('refreshToken');
             }
         }
+        setUser(null);
+        setAccessToken(null);
+        setRefreshToken(null);
+        sessionStorage.clear();
     }, []);
 
+    const refreshAuthToken = useCallback(async () => {
+        const currentRefreshToken = sessionStorage.getItem('refreshToken');
+        if (currentRefreshToken && !loading) {
+            setLoading(true);
+            try {
+                const { accessToken, accessTokenExpiration } = await authService.refreshToken(currentRefreshToken);
+                console.log('Access token refreshed');
+                setAccessToken(accessToken);
+                sessionStorage.setItem('accessToken', accessToken);
+                sessionStorage.setItem('accessTokenExpiration', accessTokenExpiration);
+            } catch (error) {
+                console.error('Session expired. Please log in again.', error);
+                logout();
+            } finally {
+                setLoading(false);
+            }
+        }
+    }, [logout, loading]);
+
     useEffect(() => {
-        if (!refreshToken) {
+        const expirationTimeStr = sessionStorage.getItem('accessTokenExpiration');
+        if (!accessToken || !expirationTimeStr) {
+            return;
+        }
+        const expirationTime = parseInt(expirationTimeStr, 10);
+        console.log(expirationTimeStr);
+        const delay = expirationTime - (60 * 1000); // Refresh 1 minute before expiration
+        console.log(delay);
+        if (delay <= 0) {
+            refreshAuthToken();
             return;
         }
 
-        const REFRESH_INTERVAL = 60000;
+        const timerId = setTimeout(refreshAuthToken, delay);
 
-        const interval = setInterval(async () => {
-            if (refreshToken && !loading) {
-                setLoading(true);
-                try {
-                    const newAccessToken = await authService.refreshToken(refreshToken);
-                    console.log('Access token refreshed');
-                    setAccessToken(newAccessToken);
-                    sessionStorage.setItem('accessToken', newAccessToken);
-                } catch (error) {
-                    console.error('Session expired. Please log in again.', error);
-                    logout();
-                } finally {
-                    setLoading(false);
-                }
-            }
-        }, REFRESH_INTERVAL);
-
-        return () => clearInterval(interval);
-    }, [refreshToken, logout, loading]);
+        return () => clearTimeout(timerId);
+    }, [accessToken, refreshAuthToken]);
 
 
     const value = {
