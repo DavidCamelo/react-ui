@@ -50,7 +50,7 @@ export const AuthProvider = ({ children }) => {
             try {
                 const { accessToken, accessTokenExpiration } = await authService.refreshToken(currentRefreshToken);
                 const expirationTime = Date.now() + accessTokenExpiration;
-                console.log('Token refreshed successfully');
+                console.log('Token refreshed successfully, new access token expires at:', new Date(expirationTime).toLocaleString());
                 setAccessToken(accessToken);
                 sessionStorage.setItem('accessToken', accessToken);
                 sessionStorage.setItem('accessTokenExpiration', expirationTime);
@@ -69,9 +69,9 @@ export const AuthProvider = ({ children }) => {
             return;
         }
         const expirationTime = parseInt(expirationTimeStr, 10);
-        console.log('Next token refresh scheduled at:', new Date(expirationTime - (60 * 1000)).toLocaleString());
+        console.log('Next token refresh scheduled at:', new Date(expirationTime - 5000).toLocaleString());
         const now = Date.now();
-        const delay = expirationTime - now - (60 * 1000); // Refresh 1 minute before expiration
+        const delay = expirationTime - now - 5000; // Refresh 5 seconds before expiration
         if (delay <= 0) {
             refreshAuthToken();
             return;
