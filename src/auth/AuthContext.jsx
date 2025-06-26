@@ -29,7 +29,7 @@ export const AuthProvider = ({ children }) => {
     };
 
     const logout = useCallback(async () => {
-        const currentToken = sessionStorage.getItem('accessToken');
+        const currentToken = sessionStorage.getItem('refreshToken');
         if (currentToken) {
             try {
                 await authService.logout(currentToken);
