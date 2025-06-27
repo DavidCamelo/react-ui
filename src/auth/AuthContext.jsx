@@ -4,9 +4,9 @@ import { authService } from 'components_ui/api';
 export const AuthContext = createContext(null);
 
 export const AuthProvider = ({ children }) => {
-    const [user, setUser] = useState(JSON.parse(sessionStorage.getItem('user')));
-    const [accessToken, setAccessToken] = useState(sessionStorage.getItem('accessToken'));
-    const [refreshToken, setRefreshToken] = useState(sessionStorage.getItem('refreshToken'));
+    const [user, setUser] = useState(JSON.parse(localStorage.getItem('user')));
+    const [accessToken, setAccessToken] = useState(localStorage.getItem('accessToken'));
+    const [refreshToken, setRefreshToken] = useState(localStorage.getItem('refreshToken'));
     const [loading, setLoading] = useState(false);
 
     const signup = async (name, lastname, email, password) => {
@@ -31,15 +31,15 @@ export const AuthProvider = ({ children }) => {
         setUser(userData);
         setAccessToken(accessToken);
         setRefreshToken(refreshToken);
-        sessionStorage.setItem('user', JSON.stringify(userData));
-        sessionStorage.setItem('accessToken', accessToken);
-        sessionStorage.setItem('refreshToken', refreshToken);
-        sessionStorage.setItem('accessTokenExpiration', expirationTime);
+        localStorage.setItem('user', JSON.stringify(userData));
+        localStorage.setItem('accessToken', accessToken);
+        localStorage.setItem('refreshToken', refreshToken);
+        localStorage.setItem('accessTokenExpiration', expirationTime);
         return userData;
     }
 
     const logout = useCallback(async () => {
-        const currentToken = sessionStorage.getItem('refreshToken');
+        const currentToken = localStorage.getItem('refreshToken');
         if (currentToken) {
             try {
                 await authService.logout(currentToken);
@@ -50,11 +50,11 @@ export const AuthProvider = ({ children }) => {
         setUser(null);
         setAccessToken(null);
         setRefreshToken(null);
-        sessionStorage.clear();
+        localStorage.clear();
     }, []);
 
     const refreshAuthToken = useCallback(async () => {
-        const currentRefreshToken = sessionStorage.getItem('refreshToken');
+        const currentRefreshToken = localStorage.getItem('refreshToken');
         if (currentRefreshToken && !loading) {
             setLoading(true);
             try {
@@ -62,8 +62,8 @@ export const AuthProvider = ({ children }) => {
                 const expirationTime = Date.now() + accessTokenExpiration;
                 console.log('Token refreshed successfully, new access token expires at:', new Date(expirationTime).toLocaleString());
                 setAccessToken(accessToken);
-                sessionStorage.setItem('accessToken', accessToken);
-                sessionStorage.setItem('accessTokenExpiration', expirationTime);
+                localStorage.setItem('accessToken', accessToken);
+                localStorage.setItem('accessTokenExpiration', expirationTime);
             } catch (error) {
                 console.error('Session expired. Please log in again.', error);
                 logout();
@@ -74,7 +74,7 @@ export const AuthProvider = ({ children }) => {
     }, [logout, loading]);
 
     useEffect(() => {
-        const expirationTimeStr = sessionStorage.getItem('accessTokenExpiration');
+        const expirationTimeStr = localStorage.getItem('accessTokenExpiration');
         if (!accessToken || !expirationTimeStr) {
             return;
         }
