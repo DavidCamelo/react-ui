@@ -9,8 +9,17 @@ export const AuthProvider = ({ children }) => {
     const [refreshToken, setRefreshToken] = useState(sessionStorage.getItem('refreshToken'));
     const [loading, setLoading] = useState(false);
 
+    const signup = async (name, lastname, email, password) => {
+        const { accessToken, refreshToken, accessTokenExpiration, refreshTokenExpiration } = await authService.signup(name, lastname, email, password);
+        return handleLogin(name, accessToken, refreshToken, accessTokenExpiration, refreshTokenExpiration);
+    };
+
     const login = async (username, password) => {
         const { accessToken, refreshToken, accessTokenExpiration, refreshTokenExpiration } = await authService.login(username, password);
+        return handleLogin(username, accessToken, refreshToken, accessTokenExpiration, refreshTokenExpiration);
+    };
+
+    const handleLogin = (username, accessToken, refreshToken, accessTokenExpiration, refreshTokenExpiration) => {
         const expirationTime = Date.now() + accessTokenExpiration;
         const refreshExpirationTime = Date.now() + refreshTokenExpiration;
         console.log('Login successful, access token expires at:', new Date(expirationTime).toLocaleString());
@@ -26,7 +35,8 @@ export const AuthProvider = ({ children }) => {
         sessionStorage.setItem('accessToken', accessToken);
         sessionStorage.setItem('refreshToken', refreshToken);
         sessionStorage.setItem('accessTokenExpiration', expirationTime);
-    };
+        return userData;
+    }
 
     const logout = useCallback(async () => {
         const currentToken = sessionStorage.getItem('refreshToken');
@@ -84,6 +94,7 @@ export const AuthProvider = ({ children }) => {
         accessToken,
         refreshToken,
         isAuthenticated: !!accessToken,
+        signup,
         login,
         logout,
         user,
