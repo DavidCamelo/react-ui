@@ -54,6 +54,12 @@ export const AuthProvider = ({ children }) => {
     }, []);
 
     const refreshAuthToken = useCallback(async () => {
+        const lockTime = parseInt(localStorage.getItem('refresh_lock_time'), 10);
+        const now = Date.now();
+        if (lockTime && (now - lockTime < 10000)) {
+            return; // Another tab is refreshing.
+        }
+        localStorage.setItem('refresh_lock_time', now);
         const currentRefreshToken = localStorage.getItem('refreshToken');
         if (currentRefreshToken && !loading) {
             setLoading(true);
@@ -69,7 +75,10 @@ export const AuthProvider = ({ children }) => {
                 logout();
             } finally {
                 setLoading(false);
+                localStorage.removeItem('refresh_lock_time');
             }
+        } else {
+             localStorage.removeItem('refresh_lock_time');
         }
     }, [logout, loading]);
 
@@ -89,6 +98,27 @@ export const AuthProvider = ({ children }) => {
         const timerId = setTimeout(refreshAuthToken, delay);
         return () => clearTimeout(timerId);
     }, [accessToken, refreshAuthToken]);
+
+    useEffect(() => {
+        const handleStorageChange = (event) => {
+            if (event.key === 'accessToken') {
+                setAccessToken(event.newValue);
+            }
+            if (event.key === 'refreshToken') {
+                setRefreshToken(event.newValue);
+            }
+            if (event.key === null) {
+                setAccessToken(null);
+                setRefreshToken(null);
+            }
+        };
+
+        window.addEventListener('storage', handleStorageChange);
+
+        return () => {
+            window.removeEventListener('storage', handleStorageChange);
+        };
+    }, []);
 
     const value = {
         accessToken,

@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
-import { Header } from 'components_ui/Header';
 import { Footer } from 'components_ui/Footer';
-import { Modal } from 'components_ui/Modal';
+import { Header } from 'components_ui/Header';
 import { Login } from 'components_ui/Login';
+import { Modal } from 'components_ui/Modal';
+import { PrivateRoute } from 'components_ui/PrivateRoute';
 import { SignUp } from 'components_ui/SignUp';
 import { Tabs } from 'components_ui/Tabs';
 import { UsersPage } from 'user_ui/UsersPage';
 import { ProductsPage } from 'product_ui/ProductsPage';
-import { PrivateRoute } from './PrivateRoute';
 import { useAuth } from '../auth/useAuth';
 
 export const MainLayout = () => {
@@ -49,11 +49,18 @@ export const MainLayout = () => {
       <Modal title="Create Account" isOpen={isSignUpModalOpen} onClose={onClose}>
           <SignUp service={useAuth()} onSignUpSuccess={handleSignUpSuccess} onCancel={onClose} />
       </Modal>
-      <PrivateRoute>
-        <div className="container mx-auto p-4 bg-gray-50">
-          <Tabs tabs={tabs} activeTab={activeTab} onTabChange={setActiveTab} />
-        </div>
-      </PrivateRoute>
+      <div className="container mx-auto p-4 bg-gray-50">
+      <PrivateRoute
+        hasPermission={user}
+        fallbackMessage={
+          <div>
+            <h2 className="text-xl font-semibold">Please log in to view this content.</h2>
+            <p className="mt-2">Authentication is required to access the dashboard.</p>
+          </div>
+        }
+        children={<Tabs tabs={tabs} activeTab={activeTab} onTabChange={setActiveTab} />}
+      />
+      </div>
       <Footer text="© 2025 David Camelo, Inc. All rights reserved." />
     </>
   );
