@@ -49,7 +49,7 @@ export const MainLayout = () => {
       <Modal title="Create Account" isOpen={isSignUpModalOpen} onClose={onClose}>
           <SignUp service={useAuth()} onSignUpSuccess={handleSignUpSuccess} onCancel={onClose} />
       </Modal>
-      <div className="container mx-auto p-4 bg-gray-50">
+      <main style={{padding: '2rem'}}>
       <PrivateRoute
         hasPermission={user}
         fallbackMessage={
@@ -60,7 +60,7 @@ export const MainLayout = () => {
         }
         children={<Tabs tabs={tabs} activeTab={activeTab} onTabChange={setActiveTab} />}
       />
-      </div>
+      </main>
       <Footer text="© 2025 David Camelo, Inc. All rights reserved." />
     </>
   );
