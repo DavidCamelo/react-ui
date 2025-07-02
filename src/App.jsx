@@ -1,6 +1,6 @@
 import React from 'react';
 import { ThemeProvider } from 'components_ui/ThemeContext';
-import { AuthProvider } from './auth/AuthContext';
+import { AuthProvider } from 'components_ui/AuthContext';
 import { MainLayout } from './layout/MainLayout';
 import './App.css';
 
