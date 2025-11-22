@@ -26,7 +26,7 @@ export default defineConfig({
     cssCodeSplit: false,
   },
   server: {
-    allowedHosts: ['react-ui']
+    allowedHosts: ['manager']
   },
   preview: {
     cors: {
@@ -34,6 +34,6 @@ export default defineConfig({
       methods: '*',
       allowedHeaders: '*'
     },
-    allowedHosts: ['react-ui', 'react-ui.davidcamelo.com']
+    allowedHosts: ['manager', 'manager.davidcamelo.com']
   }
 })
