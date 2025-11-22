@@ -8,7 +8,7 @@ metadata:
     cert-manager.io/cluster-issuer: letsencrypt
 spec:
   rules:
-    - host: react-ui.davidcamelo.com
+    - host: manager.davidcamelo.com
       http:
         paths:
           - pathType: ImplementationSpecific
@@ -19,5 +19,5 @@ spec:
                   number: 4173
   tls:
     - hosts:
-        - react-ui.davidcamelo.com
+        - manager.davidcamelo.com
       secretName: react-ui-ingress
