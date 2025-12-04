@@ -20,6 +20,7 @@ export const TabsLayout = () => {
           <div>
             <h2 className="text-xl font-semibold">Please log in to view this content.</h2>
             <p className="mt-2">Authentication is required to access the dashboard.</p>
+            <p className="mt-3">To login you can use 'user@test.com' and 'password'</p>
           </div>
         }
         children={<Tabs tabs={tabs} activeTab={activeTab} onTabChange={setActiveTab} />}
