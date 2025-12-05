@@ -16,7 +16,7 @@ spec:
               service:
                 name: react-ui
                 port:
-                  number: 4173
+                  number: 80
   tls:
     - hosts:
         - react-ui.davidcamelo.com
